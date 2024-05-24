@@ -163,6 +163,7 @@ private:
     GPS_Data _gps_basestation_data;
 
     void simulate_jamming(GPS_Data &d);
+    void simulate_spoofing(GPS_Data &d);
 
     // get delayed data
     GPS_Data interpolate_data(const GPS_Data &d, uint32_t delay_ms);

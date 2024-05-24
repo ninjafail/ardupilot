@@ -201,8 +201,8 @@ void GPS::simulate_jamming(struct GPS_Data &d)
   */
 void GPS::simulate_spoofing(struct GPS_Data &d)
 {
-    d.latitude = constrain_float(d.latitude + 10, -90, 90);
-    d.longitude = constrain_float(d.longitude + 10, -180, 180);
+    d.latitude = constrain_float(d.latitude + 0.001, -90, 90);
+    d.longitude = constrain_float(d.longitude + 0.001, -180, 180);
 }
 
 /*
