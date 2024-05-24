@@ -197,6 +197,15 @@ void GPS::simulate_jamming(struct GPS_Data &d)
 }
 
 /*
+  simple simulation of GPS spoofing
+  */
+void GPS::simulate_spoofing(struct GPS_Data &d)
+{
+    d.latitude = constrain_float(d.latitude + 10, -90, 90);
+    d.longitude = constrain_float(d.longitude + 10, -180, 180);
+}
+
+/*
   return GPS time of week
  */
 GPS_Backend::GPS_TOW GPS_Backend::gps_time()
@@ -415,6 +424,10 @@ void GPS::update()
         if (_sitl->gps_jam[idx] == 1) {
             simulate_jamming(d);
         }
+
+    if (_sitl->gps_spoof[idx] == 1) {
+        simulate_spoofing(d);
+    }
 
     backend->publish(&d);
 }
