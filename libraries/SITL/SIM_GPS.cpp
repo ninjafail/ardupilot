@@ -201,8 +201,24 @@ void GPS::simulate_jamming(struct GPS_Data &d)
   */
 void GPS::simulate_spoofing(struct GPS_Data &d)
 {
-    d.latitude = constrain_float(d.latitude + 0.001, -90, 90);
-    d.longitude = constrain_float(d.longitude + 0.001, -180, 180);
+    struct Pos_Goal {
+        double latitude;
+        double longitude;
+        float altitude;
+    };
+
+    Pos_Goal actual_goal, spoofed_goal;
+    actual_goal.latitude = -35.363262;
+    actual_goal.longitude = 149.159778;
+    actual_goal.altitude = 100.000000;
+    
+    spoofed_goal.latitude = -35.355540;
+    spoofed_goal.longitude = 149.165085;
+    spoofed_goal.altitude = 100.000000;
+    
+    d.latitude = constrain_float(actual_goal.latitude - (spoofed_goal.latitude - d.latitude), -90, 90);
+    d.longitude = constrain_float(actual_goal.longitude - (spoofed_goal.longitude - d.longitude), -180, 180);
+    d.altitude = constrain_float(actual_goal.altitude - (spoofed_goal.altitude - d.altitude), -180, 180);
 }
 
 /*
