@@ -437,9 +437,9 @@ void GPS::update()
     d.longitude += glitch_offsets.y;
     d.altitude += glitch_offsets.z;
 
-        if (_sitl->gps_jam[idx] == 1) {
-            simulate_jamming(d);
-        }
+    if (_sitl->gps_jam[idx] == 1) {
+        simulate_jamming(d);
+    }
 
     if (_sitl->gps_spoof[idx] == 1) {
         simulate_spoofing(d);
