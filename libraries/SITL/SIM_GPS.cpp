@@ -198,7 +198,7 @@ void GPS::simulate_jamming(struct GPS_Data &d)
 
 /*
   simple simulation of GPS spoofing
-  */
+ */
 void GPS::simulate_spoofing(struct GPS_Data &d)
 {
     struct Pos_Goal {
@@ -219,6 +219,31 @@ void GPS::simulate_spoofing(struct GPS_Data &d)
     d.latitude = constrain_float(actual_goal.latitude - (spoofed_goal.latitude - d.latitude), -90, 90);
     d.longitude = constrain_float(actual_goal.longitude - (spoofed_goal.longitude - d.longitude), -180, 180);
     d.altitude = constrain_float(actual_goal.altitude - (spoofed_goal.altitude - d.altitude), -180, 180);
+}
+
+/*
+  simple spoofing detection, using the last position values
+ */
+bool GPS::detect_spoofing(const GPS_Data &d)
+{
+    const uint8_t N = ARRAY_SIZE(_gps_history);
+
+    printf("CurrGPSData:\n\t lat %f\n\t lon: %f\n\t alt %f\n", d.latitude, d.longitude, d.altitude);
+    for (uint8_t i=0; i<N-1; i++) {
+        const GPS_Data &s1 = _gps_history[i];
+        // print the last 20 GPS data
+        printf("LastGPSData:\n\t lat %f\n\t lon: %f\n\t alt %f\n", s1.latitude, s1.longitude, s1.altitude);
+    }
+    return false;
+/*
+    const int max_speed = 100;
+    const float speedN = d.speedN;
+    const float speedE = d.speedE;
+    const float speedD = d.speedD;
+    const float speed2d = sqrtf(speedN*speedN + speedE*speedE);
+    const float speed3d = sqrtf(speedN*speedN + speedE*speedE + speedD*speedD);
+    return (speed2d > max_speed || speed3d > max_speed);
+*/
 }
 
 /*
@@ -444,6 +469,7 @@ void GPS::update()
     if (_sitl->gps_spoof[idx] == 1) {
         simulate_spoofing(d);
     }
+    detect_spoofing(d);
 
     backend->publish(&d);
 }
