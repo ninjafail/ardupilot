@@ -224,7 +224,7 @@ void GPS::simulate_spoofing(struct GPS_Data &d)
 /*
   simple spoofing detection, using the last position values
  */
-bool GPS::detect_spoofing(const GPS_Data &d)
+bool GPS::detect_spoofing(struct GPS_Data &d)
 {
     const uint8_t N = ARRAY_SIZE(_gps_history);
 
