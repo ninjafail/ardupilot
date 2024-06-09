@@ -226,24 +226,15 @@ void GPS::simulate_spoofing(struct GPS_Data &d)
  */
 bool GPS::detect_spoofing(struct GPS_Data &d)
 {
-    const uint8_t N = ARRAY_SIZE(_gps_history);
+    if (ARRAY_SIZE(_gps_history) < 0) return false;
+    const GPS_Data last_d = _gps_history[0];
 
-    printf("CurrGPSData:\n\t lat %f\n\t lon: %f\n\t alt %f\n", d.latitude, d.longitude, d.altitude);
-    for (uint8_t i=0; i<N-1; i++) {
-        const GPS_Data &s1 = _gps_history[i];
-        // print the last 20 GPS data
-        printf("LastGPSData:\n\t lat %f\n\t lon: %f\n\t alt %f\n", s1.latitude, s1.longitude, s1.altitude);
-    }
-    return false;
-/*
-    const int max_speed = 100;
-    const float speedN = d.speedN;
-    const float speedE = d.speedE;
-    const float speedD = d.speedD;
-    const float speed2d = sqrtf(speedN*speedN + speedE*speedE);
-    const float speed3d = sqrtf(speedN*speedN + speedE*speedE + speedD*speedD);
-    return (speed2d > max_speed || speed3d > max_speed);
-*/
+    double horizontal_threshold = 0.01;
+    float vertical_threshold = 0.1;
+
+    return (d.latitude - last_d.latitude > horizontal_threshold ||
+        d.longitude - last_d.longitude > horizontal_threshold ||
+        d.altitude - last_d.altitude > vertical_threshold)
 }
 
 /*
