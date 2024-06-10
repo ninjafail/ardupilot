@@ -274,6 +274,13 @@ const AP_Param::GroupInfo AP_GPS::var_info[] = {
     AP_SUBGROUPINFO(params[1], "2_", 33, AP_GPS, AP_GPS::Params),
 #endif
 
+    // @Param: _DETECT_SPOOF
+    // @DisplayName: GPS spoof detection
+    // @Description: Starts failsafe when detecting GPS spoofing
+    // @Values: 0:Disabled, 1:Enabled Threshold Discovery, 2:Enabled Simple Detection, 3:TODO:Enabled Complex Detection
+    AP_GROUPINFO("_DETECT_SPOOF", 34, AP_GPS, _detect_spoof, 0),
+
+
     AP_GROUPEND
 };
 
@@ -859,6 +866,11 @@ void AP_GPS::update_instance(uint8_t instance)
         return;
     }
 
+    // save old position
+    state[instance].prev_alt = state[instance].location.alt;
+    state[instance].prev_lat = state[instance].location.lat;
+    state[instance].prev_lng = state[instance].location.lng;
+
     if (_auto_config >= GPS_AUTO_CONFIG_ENABLE_SERIAL_ONLY) {
         send_blob_update(instance);
     }
@@ -976,8 +988,36 @@ void AP_GPS::update_instance(uint8_t instance)
         }
     }
 #endif
+
+    // do GPS spoofing detection
+    if (_detect_spoof == 1) {
+        find_threshold(state[instance]);
+    }
 }
 
+/*
+  simple function to find the highest delta in between two GPS updates during a normal mission
+ */
+void AP_GPS::find_threshold(struct GPS_State &s)
+{
+    if (_detect_spoof != 1) return;
+
+    int32_t delta_lat = abs(s.location.lat - s.prev_lat);
+    int32_t delta_lon = abs(s.location.lng - s.prev_lng);
+    int32_t delta_alt = abs(s.location.alt - s.prev_alt);
+
+    bool lat_inc = delta_lat > _max_delta_lat;
+    bool lon_inc = delta_lon > _max_delta_lon;
+    bool lat_alt = delta_alt > _max_delta_alt;
+
+    if (lat_inc) _max_delta_lat = delta_lat;
+    if (lon_inc) _max_delta_lon = delta_lon;
+    if (lat_alt) _max_delta_alt = delta_alt;
+
+    if (lat_inc || lon_inc || lat_alt) {
+        printf ("MAX_VALUES:\n\t max_delta_lat = %i\n\t max_delta_lon = %i\n\t max_delta_alt = %i\n", _max_delta_lat, _max_delta_lon, _max_delta_alt);
+    }
+}
 
 #if GPS_MOVING_BASELINE
 bool AP_GPS::get_RelPosHeading(uint32_t &timestamp, float &relPosHeading, float &relPosLength, float &relPosD, float &accHeading)

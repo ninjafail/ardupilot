@@ -195,6 +195,9 @@ public:
         GPS_Status status;                  ///< driver fix status
         uint32_t time_week_ms;              ///< GPS time (milliseconds from start of GPS week)
         uint16_t time_week;                 ///< GPS week number
+        int32_t prev_alt; // in cm
+        int32_t prev_lat; // in 1E7 degrees
+        int32_t prev_lng; // in 1E7 degrees
         Location location;                  ///< last fix location
         float ground_speed;                 ///< ground speed in m/s
         float ground_course;                ///< ground course in degrees
@@ -242,6 +245,13 @@ public:
         float accHeading;                  ///< Reported Heading Accuracy in degrees
         uint32_t relposheading_ts;        ///< True if new data has been received since last time it was false
     };
+
+    // bool detect_spoofing(struct GPS_State &d)
+    void find_threshold(struct GPS_State &s);
+    int32_t _max_delta_alt = 0; // in cm
+    int32_t _max_delta_lat = 0; // in 1E7 degrees
+    int32_t _max_delta_lon = 0; // in 1E7 degrees
+    bool detected_spoofing = false;
 
     /// Startup initialisation.
     void init();
@@ -620,6 +630,7 @@ protected:
     AP_Int8 _blend_mask;
     AP_Int16 _driver_options;
     AP_Int8 _primary;
+    AP_Int8 _detect_spoof;
 
     uint32_t _log_gps_bit = -1;
 
