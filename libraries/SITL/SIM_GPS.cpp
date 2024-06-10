@@ -222,6 +222,34 @@ void GPS::simulate_spoofing(struct GPS_Data &d)
 }
 
 /*
+  simple function to find the highest delta in between two GPS updates during a normal mission
+ */
+void GPS::find_threshold(struct GPS_Data &d)
+{
+    if (ARRAY_SIZE(_gps_history) < 0) return;
+    const GPS_Data last_d = _gps_history[0];
+
+    double delta_lat = fabs(d.latitude - last_d.latitude);
+    double delta_lon = fabs(d.longitude - last_d.longitude);
+    float delta_alt = fabs(d.altitude - last_d.altitude);
+
+    bool lat_inc = delta_lat > _max_delta_lat;
+    bool lon_inc = delta_lon > _max_delta_lon;
+    bool lat_alt = delta_alt > _max_delta_alt;
+
+    if (lat_inc) _max_delta_lat = fabs(delta_lat);
+    if (lon_inc) _max_delta_lon = fabs(delta_lon);
+    if (lat_alt) _max_delta_alt = fabs(delta_alt);
+    if (fabs(d.speedN) > _max_speedN) _max_speedN = fabs(d.speedN);
+    if (fabs(d.speedE) > _max_speedE) _max_speedE = fabs(d.speedE);
+    if (fabs(d.speedD) > _max_speedD) _max_speedD = fabs(d.speedD);
+
+    if (lat_inc || lon_inc || lat_alt) {
+        printf ("MAX_VALUES:\n\t max_delta_lat = %f\n\t max_delta_lon = %f\n\t max_delta_alt = %f\n", _max_delta_lat, _max_delta_lon, _max_delta_alt);
+       printf ("\t max_speedN = %f\n\t max_speedE = %f\n\t max_speedD = %f\n", _max_speedN, _max_speedE, _max_speedD);
+    }
+}
+/*
   simple spoofing detection, using the last position values
  */
 bool GPS::detect_spoofing(struct GPS_Data &d)
@@ -229,12 +257,15 @@ bool GPS::detect_spoofing(struct GPS_Data &d)
     if (ARRAY_SIZE(_gps_history) < 0) return false;
     const GPS_Data last_d = _gps_history[0];
 
-    double horizontal_threshold = 0.01;
-    float vertical_threshold = 0.1;
+    double horizontal_threshold = 0.000011 * 2;
+    float vertical_threshold = 0.255005 * 2;
+    double delta_lat = fabs(d.latitude - last_d.latitude);
+    double delta_lon = fabs(d.longitude - last_d.longitude);
+    float delta_alt = fabs(d.altitude - last_d.altitude);
 
-    return (d.latitude - last_d.latitude > horizontal_threshold ||
-        d.longitude - last_d.longitude > horizontal_threshold ||
-        d.altitude - last_d.altitude > vertical_threshold)
+    return (delta_lat > horizontal_threshold ||
+        delta_lon > horizontal_threshold ||
+        delta_alt > vertical_threshold);
 }
 
 /*
@@ -460,7 +491,16 @@ void GPS::update()
     if (_sitl->gps_spoof[idx] == 1) {
         simulate_spoofing(d);
     }
-    detect_spoofing(d);
+
+    if (_sitl->gps_detect[idx] == 1) {
+        find_threshold(d);
+    }
+    if (_sitl->gps_detect[idx] == 2 && !detected_spoofing) {
+        detected_spoofing = detect_spoofing(d);
+    }
+    if (detected_spoofing)
+        printf("SIM_GPS: detected spoofing\n");
+
 
     backend->publish(&d);
 }

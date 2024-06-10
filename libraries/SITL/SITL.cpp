@@ -674,6 +674,12 @@ const AP_Param::GroupInfo SIM::var_gps[] = {
     // @User: Advanced
     // @Values: 0:Disabled, 1:Enabled
     AP_GROUPINFO("GPS_SPOOF",       17, SIM,  gps_spoof[0], 0),
+    // @Param: GPS_DETECT
+    // @DisplayName: GPS spoofing detection
+    // @Description: Enable simulated GPS spoofing detection
+    // @User: Advanced
+    // @Values: 0:Disabled, 1:Enabled Threshold Discovery, 2:Enabled Simple Detection, 3:Enabled Complex Detection
+    AP_GROUPINFO("GPS_DETECT",       18, SIM,  gps_detect[0], 0),
     // @Param: GPS2_DISABLE
     // @DisplayName: GPS 2 disable
     // @Description: Disables GPS 2

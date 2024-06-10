@@ -212,6 +212,7 @@ public:
     AP_Vector3f gps_vel_err[2]; // Velocity error offsets in NED (x = N, y = E, z = D)
     AP_Int8 gps_jam[2]; // jamming simulation enable
     AP_Int8 gps_spoof[2]; // spoofing simulation enable
+    AP_Int8 gps_detect[2]; // spoofing detection simulation enable
 
     // initial offset on GPS lat/lon, used to shift origin
     AP_Float gps_init_lat_ofs;
