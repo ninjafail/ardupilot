@@ -107,7 +107,34 @@ void Copter::ekf_check()
     // set AP_Notify flags
     AP_Notify::flags.ekf_bad = ekf_check_state.bad_variance;
 
-    // To-Do: add ekf variances to extended status
+    // check for spoofing here for ability to call failsafe_ekf_event, using detected_spooky_spoofing from SIM_GPS
+    // do GPS spoofing detection
+    struct Location location = gps.location();
+    if (gps._detect_spoof == 2 && detect_spoofing(location)) {
+        printf("GPS spoofing detected, activate failsafe\n");
+        failsafe_ekf_event();
+    }
+    gps.prev_alt = location.alt;
+    gps.prev_lat = location.lat;
+    gps.prev_lng = location.lng;
+
+// To-Do: add ekf variances to extended status
+}
+
+/*
+  simple spoofing detection, using the last position values
+ */
+bool Copter::detect_spoofing(struct Location l)
+{
+    double horizontal_threshold = 222 * 2;
+    float vertical_threshold = 51 * 2;
+    int32_t delta_lat = abs(l.lat - gps.prev_lat);
+    int32_t delta_lon = abs(l.lng - gps.prev_lng);
+    int32_t delta_alt = abs(l.alt - gps.prev_alt);
+
+    return (delta_lat > horizontal_threshold ||
+            delta_lon > horizontal_threshold ||
+            delta_alt > vertical_threshold);
 }
 
 // ekf_over_threshold - returns true if the ekf's variance are over the tolerance

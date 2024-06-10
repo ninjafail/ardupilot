@@ -989,7 +989,7 @@ void AP_GPS::update_instance(uint8_t instance)
     }
 #endif
 
-    // do GPS spoofing detection
+    // do GPS spoofing threshold discovery
     if (_detect_spoof == 1) {
         find_threshold(state[instance]);
     }

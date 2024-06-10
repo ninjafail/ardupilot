@@ -1059,6 +1059,7 @@ private:
 
 public:
     void failsafe_check();      // failsafe.cpp
+    bool detect_spoofing(struct Location l);
 };
 
 extern Copter copter;
