@@ -679,12 +679,6 @@ const AP_Param::GroupInfo SIM::var_gps[] = {
     // @Description: Enable simulated GPS spoofing detection
     // @User: Advanced
     // @Values: 0:Disabled, 1:Enabled Threshold Discovery, 2:Enabled Simple Detection, 3:Enabled Complex Detection
-    AP_GROUPINFO("GPS_DETECT",       18, SIM,  gps_detect[0], 0),
-    // @Param: GPS2_DISABLE
-    // @DisplayName: GPS 2 disable
-    // @Description: Disables GPS 2
-    // @Values: 0:Enable, 1:GPS Disabled
-    // @User: Advanced
     AP_GROUPINFO("GPS2_DISABLE",  30, SIM,  gps_disable[1], 1),
     // @Param: GPS2_LAG_MS
     // @DisplayName: GPS 2 Lag

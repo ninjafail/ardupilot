@@ -137,15 +137,6 @@ public:
     uint32_t device_baud() const override;  // 0 meaning unset
 
 private:
-    // max_values for defining threshold
-    double _max_delta_lat = 0;
-    double _max_delta_lon = 0;
-    float _max_delta_alt = 0;
-    double _max_speedN = 0;
-    double _max_speedE = 0;
-    double _max_speedD = 0;
-
-
     uint8_t instance;
 
     // The last time GPS data was written [mS]
@@ -172,9 +163,6 @@ private:
 
     void simulate_jamming(GPS_Data &d);
     void simulate_spoofing(GPS_Data &d);
-    void find_threshold(GPS_Data &d);
-    bool detect_spoofing(GPS_Data &d);
-    bool detected_spoofing = false;
 
     // get delayed data
     GPS_Data interpolate_data(const GPS_Data &d, uint32_t delay_ms);
