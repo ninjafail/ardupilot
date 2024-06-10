@@ -445,16 +445,6 @@ void GPS::update()
         simulate_spoofing(d);
     }
 
-    if (_sitl->gps_detect[idx] == 1) {
-        find_threshold(d);
-    }
-    if (_sitl->gps_detect[idx] == 2 && !detected_spoofing) {
-        detected_spoofing = detect_spoofing(d);
-    }
-    if (detected_spoofing)
-        printf("SIM_GPS: detected spoofing\n");
-
-
     backend->publish(&d);
 }
 
