@@ -222,6 +222,16 @@ void GPS::simulate_spoofing(struct GPS_Data &d)
 }
 
 /*
+  stealthy simulation of GPS spoofing
+ */
+void GPS::simulate_stealthy_spoofing(struct GPS_Data &d)
+{    
+    d.latitude = constrain_float(d.latitude - 0.000011, -90, 90);
+    d.longitude = constrain_float(d.longitude - 0.000011, -180, 180);
+    d.altitude = constrain_float(d.altitude - 0.255005, -180, 180);
+}
+
+/*
   return GPS time of week
  */
 GPS_Backend::GPS_TOW GPS_Backend::gps_time()

@@ -788,7 +788,7 @@ const AP_Param::GroupInfo SIM::var_gps[] = {
     // @DisplayName: GPS spoofing enable
     // @Description: Enable simulated GPS spoofing
     // @User: Advanced
-    // @Values: 0:Disabled, 1:Enabled
+    // @Values: 0:Disabled, 1:Enabled, 2:Enabled with stealthy spoofing
     AP_GROUPINFO("GPS_SPOOF",       50, SIM,  gps_spoof[1], 0),
 
     AP_GROUPEND
